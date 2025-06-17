@@ -19,9 +19,9 @@
   when:
     - kdump_target.type | d(none) == 'ssh'
 
-- name: Get mode of /etc/kdump.conf if it exists
+- name: Get mode of kdump config file if it exists
   stat:
-    path: /etc/kdump.conf
+    path: "{{ __kdump_config_file }}"
   register: __kdump_conf
 
 - name: Generate /etc/kdump.conf
@@ -31,7 +31,7 @@
     backup: true
     mode: "{{ __kdump_conf.stat.mode | d('0644') }}"
   notify: Restart kdump
-  when: ansible_facts['distribution'] != 'SLES'
+  when: ansible_facts['os_family'] != 'Suse'
 
 - name: Generate SLES kdump configuration
   template:
@@ -40,7 +40,7 @@
     backup: true
     mode: "{{ __kdump_conf.stat.mode | d('0644') }}"
   notify: Restart kdump
-  when: ansible_facts['distribution'] == 'SLES'
+  when: ansible_facts['os_family'] == 'Suse'
 
 - name: Find out reserved memory for the crash kernel
   slurp:
@@ -69,11 +69,25 @@
       changed_when: true
 
 - name: Update crashkernel setting for SLES if needed
-  command: grub2-editenv - set crashkernel=auto
   when:
     - kdump_reboot_required | bool
-    - ansible_facts['distribution'] == 'SLES'
-  changed_when: true
+    - ansible_facts['os_family'] == 'Suse'
+    - ansible_facts['distribution'] in ['SLES', 'SLES_SAP']
+    - ansible_facts['distribution_version'] | float >= 15.5
+  block:
+    - name: Calculate crash kernel size for SLES
+      command: kdumptool calibrate
+      register: kdump_calibration
+      changed_when: false
+
+    - name: Set crash kernel size for SLES
+      set_fact:
+        crashkernel_size: "{{ kdump_calibration.stdout_lines | select('match', '^Low:') | first | regex_replace('^Low: (\\d+).*', '\\1') }}"
+
+    - name: Update crashkernel setting for SLES
+      command: grub2-editenv /boot/grub2/grubenv set crashkernel={{ crashkernel_size }}M
+      when: crashkernel_size is defined
+      changed_when: true
 
 - name: Fail if reboot is required and kdump_reboot_ok is false
   fail:

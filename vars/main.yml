@@ -11,6 +11,9 @@ __kdump_packages:
   - kexec-tools
   - openssh-clients
 
+# Default configuration file path for RHEL and clones
+__kdump_config_file: /etc/kdump.conf
+
 __kdump_required_facts:
   - all_ipv4_addresses
   - all_ipv6_addresses
