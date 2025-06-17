@@ -1,0 +1,15 @@
+---
+- name: Test kdump role on SLES
+  hosts: sles
+  become: true
+  vars:
+    kdump_target:
+      type: local
+      path: /var/crash
+    kdump_system_action: reboot
+    kdump_reboot_ok: true
+
+  tasks:
+    - name: Include kdump role
+      include_role:
+        name: kdump 

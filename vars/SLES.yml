@@ -1,0 +1,38 @@
+---
+# SLES specific package names
+__kdump_packages:
+  - kdump
+  - makedumpfile
+
+# SLES specific paths and configuration
+__kdump_config_file: /etc/sysconfig/kdump
+__kdump_service_name: kdump
+__kdump_bootloader_tool: grub2-editenv
+__kdump_crashkernel_param: crashkernel=auto
+
+# Required facts for SLES
+__kdump_required_facts:
+  - distribution
+  - distribution_major_version
+  - distribution_version
+  - os_family
+__kdump_required_facts_subsets:
+  - distribution
+  - os_family
+
+# SLES specific configuration defaults
+__kdump_sles_defaults:
+  savedir: /var/crash
+  dumpformat: compressed
+  dumplevel: 31
+  immediate_reboot: true
+  core_collector: makedumpfile -l --message-level 1 -d 31
+  default: reboot
+  force_rebuild: 1
+  kdump_post: /var/lib/kdump/kdump-post
+  kdump_pre: /var/lib/kdump/kdump-pre
+  extra_bins: /usr/sbin/makedumpfile
+  extra_modules: ext4
+  kdump_kernel_ver: ""
+  kdump_initrd_ver: ""
+  kdump_auto_reset_crashkernel: true 

@@ -31,6 +31,16 @@
     backup: true
     mode: "{{ __kdump_conf.stat.mode | d('0644') }}"
   notify: Restart kdump
+  when: ansible_facts['distribution'] != 'SLES'
+
+- name: Generate SLES kdump configuration
+  template:
+    src: kdump.conf.sles.j2
+    dest: /etc/sysconfig/kdump
+    backup: true
+    mode: "{{ __kdump_conf.stat.mode | d('0644') }}"
+  notify: Restart kdump
+  when: ansible_facts['distribution'] == 'SLES'
 
 - name: Find out reserved memory for the crash kernel
   slurp:
@@ -57,6 +67,13 @@
       command: grubby --args=crashkernel=auto --update-kernel=ALL
       when: ansible_facts['distribution_major_version'] | int <= 8
       changed_when: true
+
+- name: Update crashkernel setting for SLES if needed
+  command: grub2-editenv - set crashkernel=auto
+  when:
+    - kdump_reboot_required | bool
+    - ansible_facts['distribution'] == 'SLES'
+  changed_when: true
 
 - name: Fail if reboot is required and kdump_reboot_ok is false
   fail:
