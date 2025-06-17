@@ -9,3 +9,33 @@ kdump_sshkey: /root/.ssh/kdump_id_rsa
 kdump_reboot_ok: false
 kdump_auto_reset_crashkernel: true
 kdump_dracut_args: null
+
+# SLES specific configuration
+kdump_sles:
+  kernelver: ""
+  cpus: 0
+  commandline: ""
+  commandline_append: ""
+  auto_resize: false
+  kexec_options: ""
+  transfer: ""
+  keep_old_dumps: 0
+  free_disk_size: 64
+  verbose: 0
+  dumplevel: 31
+  dumpformat: "compressed"
+  continue_on_error: true
+  required_programs: ""
+  prescript: "/var/lib/kdump/kdump-pre"
+  postscript: "/var/lib/kdump/kdump-post"
+  netconfig: "auto"
+  net_timeout: 30
+  smtp:
+    server: ""
+    user: ""
+    password: ""
+    notification_to: ""
+    notification_cc: ""
+  ssh:
+    host_key: ""
+    identity: ""

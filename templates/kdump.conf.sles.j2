@@ -2,40 +2,47 @@
 # SLES kdump configuration
 
 # Basic configuration
-KDUMP_SAVEDIR="{{ kdump_target.path | default('/var/crash') }}"
-KDUMP_DUMPFORMAT="compressed"
-KDUMP_DUMPLEVEL=31
-KDUMP_IMMEDIATE_REBOOT="{{ 'yes' if kdump_system_action == 'reboot' else 'no' }}"
+KDUMP_KERNELVER="{{ kdump_sles.kernelver }}"
+KDUMP_CPUS={{ kdump_sles.cpus }}
+KDUMP_COMMANDLINE="{{ kdump_sles.commandline }}"
+KDUMP_COMMANDLINE_APPEND="{{ kdump_sles.commandline_append }}"
+KDUMP_AUTO_RESIZE="{{ kdump_sles.auto_resize | string | lower }}"
+KEXEC_OPTIONS="{{ kdump_sles.kexec_options }}"
+KDUMP_IMMEDIATE_REBOOT="{{ 'true' if kdump_system_action == 'reboot' else 'false' }}"
+KDUMP_TRANSFER="{{ kdump_sles.transfer }}"
+KDUMP_SAVEDIR="{{ kdump_path | default('/var/crash') }}"
+KDUMP_KEEP_OLD_DUMPS={{ kdump_sles.keep_old_dumps }}
+KDUMP_FREE_DISK_SIZE={{ kdump_sles.free_disk_size }}
+KDUMP_VERBOSE={{ kdump_sles.verbose }}
+KDUMP_DUMPLEVEL={{ kdump_sles.dumplevel }}
+KDUMP_DUMPFORMAT="{{ kdump_sles.dumpformat }}"
+KDUMP_CONTINUE_ON_ERROR="{{ kdump_sles.continue_on_error | string | lower }}"
+KDUMP_REQUIRED_PROGRAMS="{{ kdump_sles.required_programs }}"
+KDUMP_PRESCRIPT="{{ kdump_sles.prescript }}"
+KDUMP_POSTSCRIPT="{{ kdump_sles.postscript }}"
+KDUMP_NETCONFIG="{{ kdump_sles.netconfig }}"
+KDUMP_NET_TIMEOUT={{ kdump_sles.net_timeout }}
 
 # Core collector configuration
 {% if kdump_core_collector is defined %}
 KDUMP_CORE_COLLECTOR="{{ kdump_core_collector }}"
 {% endif %}
 
-# Default action
-KDUMP_DEFAULT="{{ kdump_sles_config.default | default(__kdump_sles_defaults.default) }}"
-
-# Force rebuild
-KDUMP_FORCE_REBUILD="{{ kdump_sles_config.force_rebuild | default(__kdump_sles_defaults.force_rebuild) }}"
-
-# Pre and post scripts
-KDUMP_POST="{{ kdump_sles_config.kdump_post | default(__kdump_sles_defaults.kdump_post) }}"
-KDUMP_PRE="{{ kdump_sles_config.kdump_pre | default(__kdump_sles_defaults.kdump_pre) }}"
-
-# Additional binaries and modules
-KDUMP_EXTRA_BINS="{{ kdump_sles_config.extra_bins | default(__kdump_sles_defaults.extra_bins) }}"
-KDUMP_EXTRA_MODULES="{{ kdump_sles_config.extra_modules | default(__kdump_sles_defaults.extra_modules) }}"
-
-# Kernel and initrd versions
-KDUMP_KERNEL_VER="{{ kdump_sles_config.kdump_kernel_ver | default(__kdump_sles_defaults.kdump_kernel_ver) }}"
-KDUMP_INITRD_VER="{{ kdump_sles_config.kdump_initrd_ver | default(__kdump_sles_defaults.kdump_initrd_ver) }}"
-
 # SSH configuration
 {% if kdump_target.type is defined and kdump_target.type == 'ssh' %}
 KDUMP_SSH_USER="{{ kdump_ssh_user }}"
 KDUMP_SSH_SERVER="{{ kdump_ssh_server }}"
 KDUMP_SSH_KEY="{{ kdump_sshkey }}"
+KDUMP_HOST_KEY="{{ kdump_sles.ssh.host_key }}"
+KDUMP_SSH_IDENTITY="{{ kdump_sles.ssh.identity }}"
 {% endif %}
+
+# SMTP configuration
+KDUMP_SMTP_SERVER="{{ kdump_sles.smtp.server }}"
+KDUMP_SMTP_USER="{{ kdump_sles.smtp.user }}"
+KDUMP_SMTP_PASSWORD="{{ kdump_sles.smtp.password }}"
+KDUMP_NOTIFICATION_TO="{{ kdump_sles.smtp.notification_to }}"
+KDUMP_NOTIFICATION_CC="{{ kdump_sles.smtp.notification_cc }}"
 
 # Additional dracut arguments
 {% if kdump_dracut_args is defined %}
