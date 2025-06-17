@@ -3,25 +3,15 @@
 __kdump_packages:
   - kdump
   - makedumpfile
+  - kexec-tools
 
 # SLES specific paths and configuration
 __kdump_config_file: /etc/sysconfig/kdump
 __kdump_service_name: kdump
 __kdump_bootloader_tool: grub2-editenv
-__kdump_crashkernel_param: crashkernel=auto
-
-# Required facts for SLES
-__kdump_required_facts:
-  - distribution
-  - distribution_major_version
-  - distribution_version
-  - os_family
-__kdump_required_facts_subsets:
-  - distribution
-  - os_family
 
 # SLES specific configuration defaults
-__kdump_sles_defaults:
+kdump_sles_config:
   savedir: /var/crash
   dumpformat: compressed
   dumplevel: 31
@@ -34,5 +24,4 @@ __kdump_sles_defaults:
   extra_bins: /usr/sbin/makedumpfile
   extra_modules: ext4
   kdump_kernel_ver: ""
-  kdump_initrd_ver: ""
-  kdump_auto_reset_crashkernel: true 
+  kdump_initrd_ver: "" 
